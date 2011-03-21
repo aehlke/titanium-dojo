@@ -42,9 +42,13 @@ dojo._xhrObj = function(args){ Ti.API.info('_xhrObj()'); Ti.API.info(args);
     xhr.abort = _xhr.abort;
 
     _xhr.onerror = _xhr.onload = function() {
+        Ti.API.info('onload or onerror start');
         xhr.responseText = _xhr.responseText;
-        xhr.responseXML = _xhr.responseXML;
+        /*try {
+            xhr.responseXML = _xhr.responseXML;
+        } catch(e) {}*/
         xhr.status = _xhr.status;
+        Ti.API.info('onload or onerror end');
     };
 
     _xhr.onreadystatechange = function() {
