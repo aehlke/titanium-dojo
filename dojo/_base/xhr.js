@@ -1,4 +1,4 @@
-define("dojo/_base/xhr", ["dojo/lib/kernel", "dojo/_base/Deferred", "dojo/_base/json", "dojo/_base/lang", "dojo/_base/query"], function(dojo){
+define("dojo/_base/xhr", ["dojo/lib/kernel", "dojo/_base/Deferred", "dojo/_base/json", "dojo/_base/lang"], function(dojo){
 
 //>>excludeStart("webkitMobile", kwArgs.webkitMobile);
 (function(){
@@ -26,86 +26,6 @@ define("dojo/_base/xhr", ["dojo/lib/kernel", "dojo/_base/Deferred", "dojo/_base/
 		}
 	}
 	
-	dojo.fieldToObject = function(/*DOMNode||String*/ inputNode){
-		// summary:
-		//		Serialize a form field to a JavaScript object.
-		//
-		// description:
-		//		Returns the value encoded in a form field as
-		//		as a string or an array of strings. Disabled form elements
-		//		and unchecked radio and checkboxes are skipped.	Multi-select
-		//		elements are returned as an array of string values.
-		var ret = null;
-		var item = _d.byId(inputNode);
-		if(item){
-			var _in = item.name;
-			var type = (item.type||"").toLowerCase();
-			if(_in && type && !item.disabled){
-				if(type == "radio" || type == "checkbox"){
-					if(item.checked){ ret = item.value; }
-				}else if(item.multiple){
-					ret = [];
-					_d.query("option", item).forEach(function(opt){
-						if(opt.selected){
-							ret.push(opt.value);
-						}
-					});
-				}else{
-					ret = item.value;
-				}
-			}
-		}
-		return ret; // Object
-	};
-
-	dojo.formToObject = function(/*DOMNode||String*/ formNode){
-		// summary:
-		//		Serialize a form node to a JavaScript object.
-		// description:
-		//		Returns the values encoded in an HTML form as
-		//		string properties in an object which it then returns. Disabled form
-		//		elements, buttons, and other non-value form elements are skipped.
-		//		Multi-select elements are returned as an array of string values.
-		//
-		// example:
-		//		This form:
-		//		|	<form id="test_form">
-		//		|		<input type="text" name="blah" value="blah">
-		//		|		<input type="text" name="no_value" value="blah" disabled>
-		//		|		<input type="button" name="no_value2" value="blah">
-		//		|		<select type="select" multiple name="multi" size="5">
-		//		|			<option value="blah">blah</option>
-		//		|			<option value="thud" selected>thud</option>
-		//		|			<option value="thonk" selected>thonk</option>
-		//		|		</select>
-		//		|	</form>
-		//
-		//		yields this object structure as the result of a call to
-		//		formToObject():
-		//
-		//		|	{
-		//		|		blah: "blah",
-		//		|		multi: [
-		//		|			"thud",
-		//		|			"thonk"
-		//		|		]
-		//		|	};
-
-		var ret = {};
-		var exclude = "file|submit|image|reset|button|";
-		_d.forEach(dojo.byId(formNode).elements, function(item){
-			var _in = item.name;
-			var type = (item.type||"").toLowerCase();
-			if(_in && type && exclude.indexOf(type) == -1 && !item.disabled){
-				setValue(ret, _in, _d.fieldToObject(item));
-				if(type == "image"){
-					ret[_in+".x"] = ret[_in+".y"] = ret[_in].x = ret[_in].y = 0;
-				}
-			}
-		});
-		return ret; // Object
-	};
-
 	dojo.objectToQuery = function(/*Object*/ map){
 		//	summary:
 		//		takes a name/value mapping object and returns a string representing
@@ -143,20 +63,6 @@ define("dojo/_base/xhr", ["dojo/lib/kernel", "dojo/_base/Deferred", "dojo/_base/
 			}
 		}
 		return pairs.join("&"); // String
-	};
-
-	dojo.formToQuery = function(/*DOMNode||String*/ formNode){
-		// summary:
-		//		Returns a URL-encoded string representing the form passed as either a
-		//		node or string ID identifying the form to serialize
-		return _d.objectToQuery(_d.formToObject(formNode)); // String
-	};
-
-	dojo.formToJson = function(/*DOMNode||String*/ formNode, /*Boolean?*/prettyPrint){
-		// summary:
-		//		Create a serialized JSON string from a form node or string
-		//		ID identifying the form to serialize
-		return _d.toJson(_d.formToObject(formNode), prettyPrint); // String
 	};
 
 	dojo.queryToObject = function(/*String*/ str){
@@ -321,9 +227,6 @@ define("dojo/_base/xhr", ["dojo/lib/kernel", "dojo/_base/Deferred", "dojo/_base/
 		//	timeout: Integer?
 		//		Milliseconds to wait for the response. If this time
 		//		passes, the then error callbacks are called.
-		//	form: DOMNode?
-		//		DOM node for a form. Used to extract the form values
-		//		and send to the server.
 		//	preventCache: Boolean?
 		//		Default is false. If true, then a
 		//		"dojo.preventCache" parameter is sent in the request
@@ -358,7 +261,6 @@ define("dojo/_base/xhr", ["dojo/lib/kernel", "dojo/_base/Deferred", "dojo/_base/
 		this.url = url;
 		this.content = content;
 		this.timeout = timeout;
-		this.form = form;
 		this.preventCache = preventCache;
 		this.handleAs = handleAs;
 		this.ioPublish = ioPublish;
@@ -498,26 +400,10 @@ define("dojo/_base/xhr", ["dojo/lib/kernel", "dojo/_base/Deferred", "dojo/_base/
 
 		var ioArgs = {args: args, url: args.url};
 
-		//Get values from form if requestd.
-		var formObject = null;
-		if(args.form){
-			var form = _d.byId(args.form);
-			//IE requires going through getAttributeNode instead of just getAttribute in some form cases,
-			//so use it for all.  See #2844
-			var actnNode = form.getAttributeNode("action");
-			ioArgs.url = ioArgs.url || (actnNode ? actnNode.value : null);
-			formObject = _d.formToObject(form);
-		}
-
 		// set up the query params
 		var miArgs = [{}];
 	
-		if(formObject){
-			// potentially over-ride url-provided params w/ form values
-			miArgs.push(formObject);
-		}
 		if(args.content){
-			// stuff in content over-rides what's set by form
 			miArgs.push(args.content);
 		}
 		if(args.preventCache){
@@ -918,17 +804,6 @@ define("dojo/_base/xhr", ["dojo/lib/kernel", "dojo/_base/Deferred", "dojo/_base/
 		return _d.xhr("DELETE", args); //dojo.Deferred
 	};
 
-	/*
-	dojo.wrapForm = function(formNode){
-		//summary:
-		//		A replacement for FormBind, but not implemented yet.
-
-		// FIXME: need to think harder about what extensions to this we might
-		// want. What should we allow folks to do w/ this? What events to
-		// set/send?
-		throw new Error("dojo.wrapForm not yet implemented");
-	}
-	*/
 //>>excludeStart("webkitMobile", kwArgs.webkitMobile);
 })();
 //>>excludeEnd("webkitMobile");
