@@ -198,6 +198,8 @@ if(typeof dojo == "undefined"){
 				l.loadSubScript(tmps[x], this)
 			}else if(isOpera){ // opera fails silently!!
 				injectXHRCode(tmps[x]);
+            }else if(hostEnv === "titanium"){
+                require(dojoConfig.tiBaseDir + tmps[x].substring(1, tmps[x].length-3));
 			}else{
 				try{
 					document.write("<scr"+"ipt type='text/javascript' src='"+tmps[x]+"'></scr"+"ipt>");
