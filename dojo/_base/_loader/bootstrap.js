@@ -142,7 +142,7 @@ djConfig = {
 		// for Firebug 1.2
 		this["loadFirebugConsole"]();
 	}else{
-		this.console = this.console || {};
+		if (!this.console) { this.console = {}; }
 
 		//	Be careful to leave 'log' always at the end
 		var cn = [

@@ -94,7 +94,7 @@ if(dojo.isIE){
 	var _destroyContainer = null,
 		_destroyDoc;
 	//>>excludeStart("webkitMobile", kwArgs.webkitMobile);
-	d.addOnWindowUnload(function(){
+    d.addOnWindowUnload && d.addOnWindowUnload(function(){
 		_destroyContainer = null; //prevent IE leak
 	});
 	//>>excludeEnd("webkitMobile");
