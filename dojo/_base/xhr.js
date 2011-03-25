@@ -662,15 +662,15 @@ define("dojo/_base/xhr", ["dojo/lib/kernel", "dojo/_base/Deferred", "dojo/_base/
 		return 4 == dfd.ioArgs.xhr.readyState; //boolean
 	};
 	var _resHandle = function(/*Deferred*/dfd){
-        Ti.API.info('_resHandle');
+        //Ti.API.info('_resHandle');
 		var xhr = dfd.ioArgs.xhr;
 		//Ti.API.info(_d._isDocumentOk(xhr));
 		if(_d._isDocumentOk(xhr)){
-            Ti.API.info('_resHandle: calling back dfd');
+            //Ti.API.info('_resHandle: calling back dfd');
             //Ti.API.info(dfd);
 			dfd.callback(dfd);
 		}else{
-            Ti.API.info('_resHandle: erroring');
+            //Ti.API.info('_resHandle: erroring');
 			var err = new Error("Unable to load " + dfd.ioArgs.url + " status:" + xhr.status);
 			err.status = xhr.status;
 			err.responseText = xhr.responseText;
@@ -762,13 +762,13 @@ define("dojo/_base/xhr", ["dojo/lib/kernel", "dojo/_base/Deferred", "dojo/_base/
 				}else if(args.headers[hdr]){
 					//Only add header if it has a value. This allows for instnace, skipping
 					//insertion of X-Requested-With by specifying empty value.
-                    Ti.API.info('setting request header');Ti.API.info(hdr);Ti.API.info(args.headers[hdr]);
+                    //Ti.API.info('setting request header');Ti.API.info(hdr);Ti.API.info(args.headers[hdr]);
 					xhr.setRequestHeader(hdr, args.headers[hdr]);
 				}
 			}
 		}
 		// FIXME: is this appropriate for all content types?
-        Ti.API.info('setting request header');Ti.API.info("Content-Type");Ti.API.info(args.contentType||_defaultContentType);
+        //Ti.API.info('setting request header');Ti.API.info("Content-Type");Ti.API.info(args.contentType||_defaultContentType);
 		xhr.setRequestHeader("Content-Type", args.contentType || _defaultContentType);
 		if(!args.headers || !("X-Requested-With" in args.headers)){
 			xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
@@ -779,10 +779,10 @@ define("dojo/_base/xhr", ["dojo/lib/kernel", "dojo/_base/Deferred", "dojo/_base/
 			xhr.send(ioArgs.query);
 		}else{
 			try{
-        Ti.API.info('sending xhr');
-        Ti.API.info(ioArgs.query);
+        //Ti.API.info('sending xhr');
+        //Ti.API.info(ioArgs.query);
 				xhr.send(ioArgs.query);
-        Ti.API.info('sent xhr');
+        //Ti.API.info('sent xhr');
 			}catch(e){
 				ioArgs.error = e;
 				dfd.cancel();
@@ -790,7 +790,7 @@ define("dojo/_base/xhr", ["dojo/lib/kernel", "dojo/_base/Deferred", "dojo/_base/
 		}
 		_d._ioWatch(dfd, _validCheck, _ioCheck, _resHandle);
 		xhr = null;
-        Ti.API.info('finishing dojo.xhr');
+        //Ti.API.info('finishing dojo.xhr');
 		return dfd; // dojo.Deferred
 	};
 

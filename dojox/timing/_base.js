@@ -22,11 +22,11 @@ dojo.extend(dojox.timing.Timer, {
 		// summary: Reset the interval of a timer, whether running or not.
 		// interval: New interval, in milliseconds.
 		if (this.isRunning){
-			window.clearInterval(this.timer);
+			clearInterval(this.timer);
 		}
 		this.interval = interval;
 		if (this.isRunning){
-			this.timer = window.setInterval(dojo.hitch(this, "onTick"), this.interval);
+			this.timer = setInterval(dojo.hitch(this, "onTick"), this.interval);
 		}
 	},
 	
@@ -39,7 +39,7 @@ dojo.extend(dojox.timing.Timer, {
 			this.onStart();
 		}
 		this.isRunning = true;
-		this.timer = window.setInterval(dojo.hitch(this, "onTick"), this.interval);
+		this.timer = setInterval(dojo.hitch(this, "onTick"), this.interval);
 	},
 	
 	stop : function(){
@@ -49,6 +49,6 @@ dojo.extend(dojox.timing.Timer, {
 			this.onStop();
 		}
 		this.isRunning = false;
-		window.clearInterval(this.timer);
+		clearInterval(this.timer);
 	}
 });
